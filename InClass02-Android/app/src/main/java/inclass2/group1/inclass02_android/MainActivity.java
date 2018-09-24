@@ -28,13 +28,16 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    static String api_ip = "54.197.68.28";//ALWAYS CHANGE THIS IP TO CONNECT TO NEW AWS IP,
 
     SurveyInfo userSurvey = new SurveyInfo();
     ProgressDialog progressDialog;
-    EditText userName,password;
+    EditText userName, password;
     private final OkHttpClient client = new OkHttpClient();
     JSONObject tokenObject;
     String token;
+    JSONObject tokenobject;
+    String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,22 +50,88 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.buttonLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(userName.getText().toString()==null || userName.getText().toString().equals("")){
-                    Toast.makeText(getApplicationContext(),"Enter valid user name",Toast.LENGTH_SHORT);
-                }else if(password.getText().toString()==null || password.getText().toString().equals("")){
-                    Toast.makeText(getApplicationContext(),"Enter valid password",Toast.LENGTH_SHORT);
-                }else{
+                if (userName.getText().toString() == null || userName.getText().toString().equals("")) {
+                    Toast.makeText(getApplicationContext(), "Enter valid user name", Toast.LENGTH_SHORT);
+                } else if (password.getText().toString() == null || password.getText().toString().equals("")) {
+                    Toast.makeText(getApplicationContext(), "Enter valid password", Toast.LENGTH_SHORT);
+                } else {
                     progressDialog = new ProgressDialog(MainActivity.this);
                     progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressDialog.setTitle("Signing Up....");
                     progressDialog.show();
-                    performLogin(userName.getText().toString(),password.getText().toString());
+                    performLogin(userName.getText().toString(), password.getText().toString());
                 }
             }
         });
     }
 
     private void performLogin(String userName, String password) {
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("email", userName);
+        jsonObject.addProperty("password", password);
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        RequestBody formBody = RequestBody.create(JSON, jsonObject.toString());
+
+        final Request request = new Request.Builder()
+                .url("http://" + api_ip + ":3000/users/login")
+
+                .post(formBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("failure", "onFailure: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                int status_code = response.code();
+                String s = response.body().string();
+                if (status_code == 200) {
+                    try {
+                        tokenobject = new JSONObject(s);
+                        token = tokenobject.getString("token");
+                        Log.d("testtest", token);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    progressDialog.dismiss();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent mainPage = new Intent(MainActivity.this, SurveyActivity.class);
+                            mainPage.putExtra("token", token);
+                            saveUserData();
+                            startActivity(mainPage);
+                            finish();
+
+                        }
+                    });
+                } else {
+                    try {
+                        tokenobject = new JSONObject(s);
+
+                        message = tokenobject.getString("message");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.dismiss();
+
+                            Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+       /*
         //creating he json object and hit the api
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("email",userName);
@@ -116,12 +185,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+*/
+
+    }
 
     private void saveUserData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("My_Pref",MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("My_Pref", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("email",userName.getText().toString());
-        editor.putString("userToken",token);
+        editor.putString("email", userName.getText().toString());
+        editor.putString("userToken", token);
         editor.commit();
     }
 }

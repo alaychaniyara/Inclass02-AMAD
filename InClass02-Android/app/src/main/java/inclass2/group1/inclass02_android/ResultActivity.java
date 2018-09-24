@@ -22,6 +22,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static inclass2.group1.inclass02_android.MainActivity.api_ip;
+
 public class ResultActivity extends AppCompatActivity {
 
     private final OkHttpClient client = new OkHttpClient();
@@ -105,7 +107,7 @@ public class ResultActivity extends AppCompatActivity {
         MediaType JSON = MediaType.parse("application/json;charset=utf-8");
         //make the api call....
         RequestBody formBody = RequestBody.create(JSON,jsonObject.toString());
-        final Request request = new Request.Builder().url("http://52.55.71.177:3000/users/addSurvey")//replace the ip here
+        final Request request = new Request.Builder().url("http://"+api_ip+":3000/users/addSurvey")//replace the ip here
                 .header("Authorization", "Bearer "+token)
                 .post(formBody)
                 .build();
