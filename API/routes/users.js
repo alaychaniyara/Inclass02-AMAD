@@ -60,9 +60,9 @@ router.post('/signUp', (req, res, next) => {
 router.get('/userSurveys', (req,res,next)=>{
     Survey.find()
         .exec()
-        .then(result => {
-            console.log(result);
-            res.status(200).json({result});
+        .then(data => {
+            console.log(data);
+            res.status(200).json({data});
         })
         .catch(err=>{
            console.log(err);
@@ -76,10 +76,10 @@ router.get('/userSurveys', (req,res,next)=>{
 router.get('/allUsers', (req,res,next) => {
     User.find()
         .exec()
-        .then(result => {
-            console.log(result);
+        .then(data => {
+            console.log(data);
             // res.write(result);
-            res.status(200).json({result});
+            res.status(200).json({data});
         })
         .catch(err => {
            res.status(500).json({
@@ -130,7 +130,7 @@ router.post('/login', (req,res,next) => {
                     const token = jwt.sign({
                         email: user[0].email,
                         id: user[0]._id
-                    },process.env.JWT_KEY,{expiresIn:"1day"});
+                    },process.env.JWT_KEY,{expiresIn:"5d"});
                     return res.status(200).json({
                         message: 'Authentication success',
                         token: token
@@ -185,13 +185,13 @@ router.post('/addSurvey',  (req,res,next) => {
         riskLevel : req.body.riskLevel
     });
     return userSurvey.save()
-        .then(result => {
-            console.log(result);
+        .then(data => {
+            console.log(data);
             res.status(201).json({
                 message : 'User Survey recorded',
                 surveyResults: {
-                    totalScore: result.totalScore,
-                    riskLevel: result.riskLevel
+                    totalScore: data.totalScore,
+                    riskLevel: data.riskLevel
                 }
             });
         }).catch(err => {

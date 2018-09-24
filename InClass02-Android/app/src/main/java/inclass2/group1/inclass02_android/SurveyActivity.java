@@ -160,10 +160,14 @@ public class SurveyActivity extends AppCompatActivity {
     private void displayQuestions(SurveyInfo surveyQues) {
         Log.d("demo", "question index: " + questionIndex);
         questionName.setText(surveyQues.getQuestion());
+        Log.d("demoqNO", "question index: " + surveyQues.getQuestionNo());
+
+        questionNo.setText(String.valueOf(surveyQues.getQuestionNo()));
         if(surveyQues.getChoice0()!=null){
             rb = new RadioButton(this);
             rb.setVisibility(View.VISIBLE);
             rb.setId(0);
+            rb.setChecked(true);
             rb.setText(surveyQues.getChoice0());
             rg.addView(rb);
         }
