@@ -17,7 +17,7 @@
         $(document).ready(function(){
             $('#userTable').DataTable({
                 ajax: {
-                    "url": "http://localhost:3000/users/allUsers"
+                    "url": "http://54.197.68.28:3000/users/allUsers"
                 },
                 columns:[{"data":"_id"},
                          {"data":"email"}
@@ -28,7 +28,7 @@
         $(document).ready(function(){
             $('#surveyTable').DataTable({
                 ajax:{
-                    "url":"http://localhost:3000/users/userSurveys"
+                    "url":"http://54.197.68.28:3000/users/userSurveys"
                 },
                 columns:[{"data":"email"},
                         {"data":"answer1"},
